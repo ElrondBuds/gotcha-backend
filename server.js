@@ -2,10 +2,12 @@
 
 // Importăm librăriile necesare
 const express = require("express");
-// **CORECTAT:** Importăm modulele specifice prin destructuring
-const { Mnemonic } = require("@multiversx/sdk-core");
-const { UserSigner } = require("@multiversx/sdk-wallet");
 const cors = require("cors");
+
+// **CORECTAT:** Importăm modulele într-un mod mai robust, care funcționează
+// în diferite medii Node.js.
+const { Mnemonic } = require("@multiversx/sdk-core/out/mnemonic");
+const { UserSigner } = require("@multiversx/sdk-wallet/out/userSigner");
 
 const app = express();
 app.use(express.json());
