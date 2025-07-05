@@ -3,8 +3,14 @@
 // Importăm librăriile necesare folosind sintaxa modernă ES Module
 import express from 'express';
 import cors from 'cors';
-import { Mnemonic } from '@multiversx/sdk-core';
-import { UserSigner } from '@multiversx/sdk-wallet';
+
+// **CORECTAT:** Folosim metoda de import recomandată de eroarea de pe Render
+// pentru a rezolva conflictul dintre modulele CommonJS și ES.
+import sdkCore from '@multiversx/sdk-core';
+import sdkWallet from '@multiversx/sdk-wallet';
+
+const { Mnemonic } = sdkCore;
+const { UserSigner } = sdkWallet;
 
 const app = express();
 app.use(express.json());
