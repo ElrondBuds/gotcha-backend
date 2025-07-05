@@ -1,47 +1,40 @@
 // server.js - Backend pentru jocul Gotcha
 
-// Importăm librăriile necesare folosind sintaxa modernă ES Module
 import express from 'express';
 import cors from 'cors';
+import { Mnemonic } from '@multiversx/sdk-core';
+import { UserSigner } from '@multiversx/sdk-wallet';
 
-// **CORECTAT:** Folosim metoda de import recomandată de eroarea de pe Render
-// pentru a rezolva conflictul dintre modulele CommonJS și ES.
-import sdkCore from '@multiversx/sdk-core';
-import sdkWallet from '@multiversx/sdk-wallet';
-
-const { Mnemonic } = sdkCore;
-const { UserSigner } = sdkWallet;
+// Dacă rulezi local și ai fișier .env, decomentează liniile de mai jos:
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors()); // Permitem cereri de la orice origine
 
 // --- CONFIGURARE ---
-// Preluăm fraza secretă din fișierul .env (metoda sigură)
+// Preluăm fraza secretă din variabila de mediu
 const signerMnemonic = process.env.SIGNER_MNEMONIC;
 if (!signerMnemonic) {
-  console.error("EROARE: Cheia de semnare (SIGNER_MNEMONIC) nu este setată în fișierul .env!");
+  console.error("EROARE: Cheia de semnare (SIGNER_MNEMONIC) nu este setată în fișierul .env sau în variabilele de mediu!");
   process.exit(1);
 }
 
-// Modul corect de a crea un signer
+// Creăm semnatarul
 const mnemonic = Mnemonic.fromString(signerMnemonic);
 const secretKey = mnemonic.deriveKey(0); // Derivăm cheia pentru primul cont (index 0)
 const signer = new UserSigner(secretKey);
 
 console.log(`Adresa publică a robotului (signer): ${signer.getAddress().bech32()}`);
 
-
 // --- BAZA DE DATE SIMULATĂ ---
-// Într-o aplicație reală, ai folosi o bază de date persistentă (ex: Firebase, Supabase).
-// Pentru acest exemplu, folosim un obiect în memorie. Datele se vor reseta la repornirea serverului.
 const gameSessions = {};
 const dailyClaims = {};
 
 // --- LOGICA JOCULUI ---
 const TREASURES = ['💎', '🪨']; // Probabilitate 50%
 
-// Endpoint pentru a începe un joc nou
 app.post("/start-game", (req, res) => {
   const { address } = req.body;
   if (!address) {
@@ -50,7 +43,7 @@ app.post("/start-game", (req, res) => {
 
   const sessionId = `session_${address}_${Date.now()}`;
   const board = Array.from({ length: 12 }, () => TREASURES[Math.floor(Math.random() * TREASURES.length)]);
-  
+
   gameSessions[sessionId] = {
     player: address,
     board: board,
@@ -58,12 +51,11 @@ app.post("/start-game", (req, res) => {
     score: 0,
     startedAt: Date.now()
   };
-  
+
   console.log(`Sesiune nouă: ${sessionId} pentru ${address}. Tabla: ${board.join('')}`);
   res.json({ sessionId });
 });
 
-// Endpoint pentru a mina o piatră
 app.post("/mine-spot", (req, res) => {
   const { sessionId, spotIndex } = req.body;
   const session = gameSessions[sessionId];
@@ -73,16 +65,15 @@ app.post("/mine-spot", (req, res) => {
 
   session.revealed[spotIndex] = true;
   const result = session.board[spotIndex];
-  
+
   if (result === '💎') {
     session.score += 1;
   }
-  
+
   console.log(`Sesiunea ${sessionId}: minat la index ${spotIndex}, găsit ${result}. Scorul este acum ${session.score}`);
   res.json({ result, newScore: session.score });
 });
 
-// Endpoint pentru a cere revendicarea
 app.post("/request-claim", (req, res) => {
   const { sessionId } = req.body;
   const session = gameSessions[sessionId];
@@ -91,18 +82,16 @@ app.post("/request-claim", (req, res) => {
 
   const { player, score } = session;
 
-  // Verifică revendicarea zilnică
-  const today = new Date().toISOString().slice(0, 10); // Format YYYY-MM-DD
+  const today = new Date().toISOString().slice(0, 10);
   if (dailyClaims[player] === today) {
     return res.status(403).json({ error: "Ai revendicat deja recompensa pentru ziua de azi." });
   }
 
-  // Semnează mesajul (adresa;scor)
   const messageToSign = Buffer.from(`${player};${score}`);
   const signature = signer.sign(messageToSign);
 
   dailyClaims[player] = today;
-  
+
   console.log(`Cerere de revendicare validată pentru ${player} cu scorul ${score}.`);
   res.json({
     score: score,
@@ -110,7 +99,6 @@ app.post("/request-claim", (req, res) => {
   });
 });
 
-// Pornește serverul
 const port = process.env.PORT || 3000;
 const listener = app.listen(port, () => {
   console.log("Robotul tău de joc este activ pe portul " + listener.address().port);
