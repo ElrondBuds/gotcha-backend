@@ -4,10 +4,13 @@
 const express = require("express");
 const cors = require("cors");
 
-// **CORECTAT:** Folosim o metodă de import mai directă și mai robustă
-// pentru a asigura compatibilitatea cu mediul de pe Render.
+// **CORECTAT:** Folosim o metodă de import care încarcă întregul pachet
+// și apoi extragem modulele necesare, pentru a garanta compatibilitatea.
 const sdkCore = require("@multiversx/sdk-core");
 const sdkWallet = require("@multiversx/sdk-wallet");
+
+const Mnemonic = sdkCore.Mnemonic;
+const UserSigner = sdkWallet.UserSigner;
 
 const app = express();
 app.use(express.json());
@@ -22,9 +25,9 @@ if (!signerMnemonic) {
 }
 
 // Modul corect de a crea un signer
-const mnemonic = sdkCore.Mnemonic.fromString(signerMnemonic);
+const mnemonic = Mnemonic.fromString(signerMnemonic);
 const secretKey = mnemonic.deriveKey(0); // Derivăm cheia pentru primul cont (index 0)
-const signer = new sdkWallet.UserSigner(secretKey);
+const signer = new UserSigner(secretKey);
 
 console.log(`Adresa publică a robotului (signer): ${signer.getAddress().bech32()}`);
 
