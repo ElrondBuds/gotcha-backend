@@ -9,9 +9,10 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "@multiversx/sdk-wallet": "^2.0.0"
+    "@multiversx/sdk-core": "^12.7.0",
+    "@multiversx/sdk-wallet": "^4.1.0"
   },
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   }
 }
