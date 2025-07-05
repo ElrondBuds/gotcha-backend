@@ -3,15 +3,14 @@
 import express from 'express';
 import cors from 'cors';
 
-// Importăm SDK-urile CommonJS corect în context ESM
+// Import corect din SDK CommonJS
 import sdkCore from '@multiversx/sdk-core';
 import sdkWallet from '@multiversx/sdk-wallet';
 
-const { HDKey } = sdkCore;
-const { Mnemonic } = HDKey;
+const { Mnemonic } = sdkCore;
 const { UserSigner } = sdkWallet;
 
-// Dacă rulezi local, poți activa dotenv:
+// Dacă rulezi local:
 // import dotenv from 'dotenv';
 // dotenv.config();
 
