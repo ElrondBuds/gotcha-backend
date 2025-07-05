@@ -1,16 +1,10 @@
 // server.js - Backend pentru jocul Gotcha
 
-// Importăm librăriile necesare
-const express = require("express");
-const cors = require("cors");
-
-// **CORECTAT:** Folosim o metodă de import care încarcă întregul pachet
-// și apoi extragem modulele necesare, pentru a garanta compatibilitatea.
-const sdkCore = require("@multiversx/sdk-core");
-const sdkWallet = require("@multiversx/sdk-wallet");
-
-const Mnemonic = sdkCore.Mnemonic;
-const UserSigner = sdkWallet.UserSigner;
+// Importăm librăriile necesare folosind sintaxa modernă ES Module
+import express from 'express';
+import cors from 'cors';
+import { Mnemonic } from '@multiversx/sdk-core';
+import { UserSigner } from '@multiversx/sdk-wallet';
 
 const app = express();
 app.use(express.json());
@@ -111,6 +105,7 @@ app.post("/request-claim", (req, res) => {
 });
 
 // Pornește serverul
-const listener = app.listen(process.env.PORT || 3000, () => {
+const port = process.env.PORT || 3000;
+const listener = app.listen(port, () => {
   console.log("Robotul tău de joc este activ pe portul " + listener.address().port);
 });
