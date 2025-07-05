@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Backend server for the Gotcha game.",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js"
   },
