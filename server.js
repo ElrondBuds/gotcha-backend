@@ -2,8 +2,8 @@
 
 // Importăm librăriile necesare
 const express = require("express");
-const { Mnemonic } = require("@multiversx/sdk-core");
-const { UserSigner } = require("@multiversx/sdk-wallet");
+const sdkCore = require("@multiversx/sdk-core");
+const sdkWallet = require("@multiversx/sdk-wallet");
 const cors = require("cors");
 
 const app = express();
@@ -19,9 +19,9 @@ if (!signerMnemonic) {
 }
 
 // **CORECTAT:** Modul nou și corect de a crea un signer
-const mnemonic = Mnemonic.fromString(signerMnemonic);
+const mnemonic = sdkCore.Mnemonic.fromString(signerMnemonic);
 const secretKey = mnemonic.deriveKey(0); // Derivăm cheia pentru primul cont (index 0)
-const signer = new UserSigner(secretKey);
+const signer = new sdkWallet.UserSigner(secretKey);
 
 console.log(`Adresa publică a robotului (signer): ${signer.getAddress().bech32()}`);
 
