@@ -1,14 +1,17 @@
+// server.js - Backend pentru jocul Gotcha
+
 import express from 'express';
 import cors from 'cors';
 
-// Importăm SDK-urile CommonJS în modul compatibil cu ESM
+// Importăm SDK-urile CommonJS corect în context ESM
 import sdkCore from '@multiversx/sdk-core';
 import sdkWallet from '@multiversx/sdk-wallet';
 
-const { Mnemonic } = sdkCore;
+const { HDKey } = sdkCore;
+const { Mnemonic } = HDKey;
 const { UserSigner } = sdkWallet;
 
-// Dacă rulezi local și ai fișier .env:
+// Dacă rulezi local, poți activa dotenv:
 // import dotenv from 'dotenv';
 // dotenv.config();
 
