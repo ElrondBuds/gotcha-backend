@@ -2,12 +2,13 @@
 
 // Importăm librăriile necesare
 const express = require("express");
-const { Mnemonic, UserSigner } = require("@multiversx/sdk-wallet");
+const { Mnemonic } = require("@multiversx/sdk-core");
+const { UserSigner } = require("@multiversx/sdk-wallet");
 const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // Permitem cereri de la orice origine (important pentru testare)
+app.use(cors()); // Permitem cereri de la orice origine
 
 // --- CONFIGURARE ---
 // Preluăm fraza secretă din fișierul .env (metoda sigură)
@@ -16,7 +17,12 @@ if (!signerMnemonic) {
   console.error("EROARE: Cheia de semnare (SIGNER_MNEMONIC) nu este setată în fișierul .env!");
   process.exit(1);
 }
-const signer = UserSigner.fromMnemonic(Mnemonic.fromString(signerMnemonic));
+
+// **CORECTAT:** Modul nou și corect de a crea un signer
+const mnemonic = Mnemonic.fromString(signerMnemonic);
+const secretKey = mnemonic.deriveKey(0); // Derivăm cheia pentru primul cont (index 0)
+const signer = new UserSigner(secretKey);
+
 console.log(`Adresa publică a robotului (signer): ${signer.getAddress().bech32()}`);
 
 
